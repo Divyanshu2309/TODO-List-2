@@ -45,28 +45,30 @@ const signupUser = async (req, res) => {
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
+    // Check if all fields are provided
     if (!email || !password) {
-        res.status(400);
-        throw new Error("All fields are mandatory!");
+        return res.status(400).json({ message: "All fields are mandatory!" });
     }
 
-    const user = await User.findOne({ email });
+    try {
+        const user = await User.findOne({ email });
 
-    // Compare password with hashed password
-    if (user && (await bcrypt.compare(password, user.password))) {
-        res.status(200).json({
-            message: "Login successful",
-            user: {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-            },
-        });
-    } else {
-        res.status(401);
-        throw new Error("Email or password is not valid");
+        // Compare password with hashed password
+        if (user && (await bcrypt.compare(password, user.password))) {
+            return res.status(200).json({
+                message: "Login successful",
+                user: {
+                    id: user._id,
+                    username: user.username,
+                    email: user.email,
+                },
+            });
+        } else {
+            return res.status(401).json({ message: "Email or password is not valid" });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: "An error occurred. Please try again." });
     }
-}
-
+};
 
 module.exports = { signupUser, loginUser };
