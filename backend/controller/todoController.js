@@ -3,8 +3,12 @@ const User = require('../model/userModel');
 
 const createTodo = async (req, res) => {
     try {
-        const { heading, content } = req.body;
-        const userId = req.user.id; // Assuming you have userId in req.user
+        const { heading, content, userId } = req.body; // Extract userId from the request body
+
+        // Validate the input
+        if (!heading || !content || !userId) {
+            return res.status(400).json({ message: 'Heading, content, and userId are required' });
+        }
 
         const newTodo = new Todo({
             heading,
@@ -13,11 +17,20 @@ const createTodo = async (req, res) => {
         });
 
         await newTodo.save();
+
+        // Optionally, you can update the user's document to add this todo to a list of todos
+        const user = await User.findById(userId);
+        if (user) {
+            user.todos.push(newTodo._id); // Assuming the User model has a todos field
+            await user.save();
+        }
+
         res.status(201).json(newTodo);
     } catch (error) {
         res.status(500).json({ message: 'Error creating todo', error });
     }
 };
+
 
 
 const getTodos = async (req, res) => {

@@ -5,7 +5,12 @@ const AuthContext = createContext();
 
 // Create a provider component
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);  // State to store user details
+    const [user, setUser] = useState(() => {
+        // Retrieve user from localStorage if it exists
+        const savedUser = localStorage.getItem('user');
+        return savedUser ? JSON.parse(savedUser) : null;
+    });
+
     const [error, setError] = useState(null); // State to store any error messages
     const [message, setMessage] = useState(null);
 
@@ -29,7 +34,9 @@ export const AuthProvider = ({ children }) => {
             if (response.ok) {
                 setMessage("Login successful!");
                 setUser(data.user); // Set user state here
+                localStorage.setItem('user', JSON.stringify(data.user)); // Save user to localStorage
                 console.log("User set in login:", data.user);
+                window.location("/");
             } else {
                 setMessage(data.message || "Login failed");
             }
@@ -38,10 +45,13 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-
+    const logout = () => {
+        setUser(null);
+        localStorage.removeItem('user'); // Remove user from localStorage
+    };
 
     return (
-        <AuthContext.Provider value={{ user, login, error }}>
+        <AuthContext.Provider value={{ user, login, logout, error }}>
             {children}
         </AuthContext.Provider>
     );

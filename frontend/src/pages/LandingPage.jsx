@@ -1,11 +1,25 @@
-import React from 'react';
+import { React, useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import { useLocation } from 'react-router-dom';
 import { Link } from "react-router-dom";
+import { useAuth } from '../provider/AuthContext';
 
 export const LandingPage = () => {
   const location = useLocation();
-  const user = location.state?.user;
+  const { user, logout } = useAuth();
+  const [localUser, setLocalUser] = useState(null);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setLocalUser(JSON.parse(savedUser));
+    }
+  }, [user]); // Re-run the effect if the user context changes
+
+  const handleLogout = () => {
+    logout();
+    setLocalUser(null);
+  };
 
   return (
     <div>
@@ -13,7 +27,7 @@ export const LandingPage = () => {
         <header className="jumbotron mt-4 text-center">
           <h1 className="display-4">Welcome to Our TODO List App</h1>
           <p className="lead">Organize your tasks efficiently and stay productive!</p>
-          {user ? (
+          {localUser ? (
             <Link to="/todo" className="btn btn-primary btn-lg">Get Started</Link>
           ) : (
             <Link to="/login" className="btn btn-primary btn-lg">Get Started</Link>

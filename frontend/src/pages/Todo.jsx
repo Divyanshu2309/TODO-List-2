@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from '../components/Navbar';
 import { Button, Form, ListGroup } from 'react-bootstrap';
 import Task from '../components/Tasks';
+import { useAuth } from '../provider/AuthContext'; // Import the custom hook to use auth context
 
 const TodoList = () => {
+    const { user } = useAuth(); // Get the user from the auth context
     const [todos, setTodos] = useState([]); // Initialize todos as an empty array
     const [todoInput, setTodoInput] = useState({ heading: '', content: '' });
 
@@ -27,12 +28,13 @@ const TodoList = () => {
     const addTodo = async () => {
         if (todoInput.heading.trim() !== '' && todoInput.content.trim() !== '') {
             try {
+                const userId = user._id; // Assuming you have the user object available
                 const response = await fetch('http://localhost:5005/todos/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(todoInput),
+                    body: JSON.stringify({ ...todoInput, userId }), // Include the user ID
                 });
                 if (!response.ok) {
                     throw new Error('Failed to add todo');
@@ -45,6 +47,7 @@ const TodoList = () => {
             }
         }
     };
+
 
     const removeTodo = async (id) => {
         try {
@@ -85,7 +88,6 @@ const TodoList = () => {
 
     return (
         <div>
-            <Navbar />
             <div className="container mt-4">
                 <h2 className="text-center mb-4">Todo List</h2>
                 <Form.Group className="mb-3">
