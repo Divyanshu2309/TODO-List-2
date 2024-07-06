@@ -26,10 +26,10 @@ const App = () => {
   );
 };
 
-const AppWrapper = () => (
-  <Router>
-    <App />
-  </Router>
-);
+// const AppWrapper = () => (
+//   <Router>
+//     <App />
+//   </Router>
+// );
 
-export default AppWrapper;
+export default App;

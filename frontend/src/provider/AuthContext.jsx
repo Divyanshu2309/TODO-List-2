@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 // Create a context
 const AuthContext = createContext();
@@ -13,6 +14,8 @@ export const AuthProvider = ({ children }) => {
 
     const [error, setError] = useState(null); // State to store any error messages
     const [message, setMessage] = useState(null);
+
+    const navigate = useNavigate(); // Initialize useNavigate
 
     const login = async (email, password) => {
         if (!email || !password) {
@@ -36,7 +39,7 @@ export const AuthProvider = ({ children }) => {
                 setUser(data.user); // Set user state here
                 localStorage.setItem('user', JSON.stringify(data.user)); // Save user to localStorage
                 console.log("User set in login:", data.user);
-                window.location("/");
+                navigate('/'); // Redirect using navigate
             } else {
                 setMessage(data.message || "Login failed");
             }

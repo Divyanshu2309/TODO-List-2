@@ -4,19 +4,15 @@ import './index.css';
 import { AuthProvider } from './provider/AuthContext';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { Router } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Login from './pages/Login';
+import { BrowserRouter as Router } from 'react-router-dom'; // Import BrowserRouter as Router
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-
-
-  <AuthProvider>
-    <App />
-  </AuthProvider >
-
-
+  <Router> {/* Wrap your application with Router */}
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  </Router>
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -6,7 +6,7 @@ const Task = ({ todo, removeTodo, updateTodo }) => {
     const [updatedTodo, setUpdatedTodo] = useState({ heading: todo.heading, content: todo.content });
 
     const handleUpdate = () => {
-        updateTodo(todo._id, updatedTodo);
+        updateTodo(todo._id, updatedTodo); // Assuming todo._id is used for identification in backend
         setIsEditing(false);
     };
 

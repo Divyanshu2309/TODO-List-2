@@ -7,6 +7,7 @@ const TodoList = () => {
     const { user } = useAuth(); // Get the user from the auth context
     const [todos, setTodos] = useState([]); // Initialize todos as an empty array
     const [todoInput, setTodoInput] = useState({ heading: '', content: '' });
+    console.log("this is user id", user.id)
 
     useEffect(() => {
         fetchTodos();
@@ -14,75 +15,112 @@ const TodoList = () => {
 
     const fetchTodos = async () => {
         try {
-            const response = await fetch('http://localhost:5005/todos/getall');
-            if (!response.ok) {
-                throw new Error('Failed to fetch todos');
-            }
-            const data = await response.json();
-            setTodos(data); // Assuming data is an array of todos
-        } catch (error) {
-            console.error('Error fetching todos:', error);
-        }
-    };
-
-    const addTodo = async () => {
-        if (todoInput.heading.trim() !== '' && todoInput.content.trim() !== '') {
-            try {
-                const userId = user._id; // Assuming you have the user object available
-                const response = await fetch('http://localhost:5005/todos/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ ...todoInput, userId }), // Include the user ID
-                });
-                if (!response.ok) {
-                    throw new Error('Failed to add todo');
-                }
-                const newTodo = await response.json();
-                setTodos([...todos, newTodo]);
-                setTodoInput({ heading: '', content: '' });
-            } catch (error) {
-                console.error('Error adding todo:', error);
-            }
-        }
-    };
-
-
-    const removeTodo = async (id) => {
-        try {
-            const response = await fetch('http://localhost:5005/todos/delete', {
-                method: 'DELETE',
+            const response = await fetch(`http://localhost:5005/todos/getall`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ id }),
+                body: JSON.stringify({ userId: user.id }), // Send userId in the request body
             });
-            if (!response.ok) {
-                throw new Error('Failed to delete todo');
+
+            const data = await response.json();
+            console.log(data)
+            if (response.ok) {
+                setTodos(data);
+            } else {
+                console.error(data.message || 'Failed to fetch todos');
             }
-            setTodos(todos.filter((todo) => todo._id !== id));
         } catch (error) {
-            console.error('Error removing todo:', error);
+            console.error('An error occurred. Please try again.');
         }
     };
 
-    const updateTodo = async (id, updatedTodo) => {
+
+    const createTodo = async () => {
+        if (!todoInput.heading || !todoInput.content) {
+            alert('Please fill in all fields');
+            return;
+        }
+
         try {
-            const response = await fetch('http://localhost:5005/todos/edit', {
+            const response = await fetch('http://localhost:5005/todos/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    heading: todoInput.heading,
+                    content: todoInput.content,
+                    userId: user.id,
+                }),
+            });
+
+            if (!response) {
+                console.error('Response is undefined');
+                return;
+            }
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Todo created successfully');
+                setTodos([...todos, data]); // Add the new todo to the current list
+                setTodoInput({ heading: '', content: '' }); // Clear the form fields
+            } else {
+                alert(data.message || 'Failed to create todo');
+            }
+        } catch (error) {
+            alert('An error occurred. Please try again.');
+            console.error('An error occurred:', error);
+        }
+    };
+
+
+    const removeTodo = async (todoId) => {
+        try {
+            const response = await fetch(`http://localhost:5005/todos/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ todoId }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Handle successful deletion (e.g., update state)
+
+            } else {
+                console.error(data.message || 'Failed to delete todo');
+            }
+        } catch (error) {
+            console.error('An error occurred. Please try again.');
+        }
+    };
+
+
+    const updateTodo = async (todoId, updatedTodoData) => {
+        try {
+            const response = await fetch(`http://localhost:5005/todos/edit`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ id, ...updatedTodo }),
+                body: JSON.stringify({ todoId, updatedTodo: updatedTodoData }),
             });
-            if (!response.ok) {
-                throw new Error('Failed to update todo');
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Handle successful update (e.g., update state)
+                alert('Todo updated successfully');
+                setTodoInput({ heading: '', content: '' }); // Clear the form fields
+            } else {
+                console.error(data.message || 'Failed to update todo');
             }
-            const newTodo = await response.json();
-            setTodos(todos.map((todo) => (todo._id === id ? newTodo : todo)));
         } catch (error) {
-            console.error('Error updating todo:', error);
+            console.error('An error occurred. Please try again.');
         }
     };
 
@@ -104,17 +142,17 @@ const TodoList = () => {
                         value={todoInput.content}
                         onChange={(e) => setTodoInput({ ...todoInput, content: e.target.value })}
                     />
-                    <Button variant="primary" className="mt-2" onClick={addTodo}>
+                    <Button variant="primary" className="mt-2" onClick={createTodo}>
                         Add Todo
                     </Button>
                 </Form.Group>
                 <ListGroup>
                     {todos.map((todo) => (
                         <Task
-                            key={todo._id}
+                            key={todo.id}
                             todo={todo}
-                            removeTodo={removeTodo}
-                            updateTodo={updateTodo}
+                            removeTodo={() => removeTodo(todo.id)}
+                            updateTodo={(updatedTodo) => updateTodo(todo.id, updatedTodo)}
                         />
                     ))}
                 </ListGroup>

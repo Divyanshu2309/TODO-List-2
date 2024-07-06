@@ -5,6 +5,16 @@ const User = require("../../backend/model/userModel");
 //@description  Register a USER
 //@route POST api/user/signup
 //@access public
+
+const getUsers = async (req, res) => {
+    try {
+        const users = await User.find(); // Retrieve all users from the database
+        res.json(users); // Send the users as JSON response
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+}
 const signupUser = async (req, res) => {
     const { username, email, password } = req.body;
 
@@ -71,4 +81,4 @@ const loginUser = async (req, res) => {
     }
 };
 
-module.exports = { signupUser, loginUser };
+module.exports = { signupUser, loginUser, getUsers };

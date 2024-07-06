@@ -9,7 +9,7 @@ const todoSchema = mongoose.Schema({
         type: String,
         required: [true, "Provide content to be stored in TODO List"],
     },
-    user: { type: Schema.Types.ObjectId, ref: 'User', required: true } // Reference to the user
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true } // Reference to the user
 },
 );
 
