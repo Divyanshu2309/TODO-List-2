@@ -35,6 +35,32 @@ const TodoList = () => {
         }
     };
 
+    const updateTodo = async (todoId, updatedTodoData) => {
+        try {
+            const response = await fetch(`http://localhost:5005/todos/edit`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ todoId, updatedTodo: updatedTodoData }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setTodos((prevTodos) =>
+                    prevTodos.map((todo) =>
+                        todo._id === todoId ? { ...todo, ...updatedTodoData } : todo
+                    )
+                );
+                alert('Todo updated successfully');
+            } else {
+                console.error(data.message || 'Failed to update todo');
+            }
+        } catch (error) {
+            console.error('An error occurred. Please try again.');
+        }
+    };
 
     const createTodo = async () => {
         if (!todoInput.heading || !todoInput.content) {
@@ -90,34 +116,10 @@ const TodoList = () => {
 
             if (response.ok) {
                 // Handle successful deletion (e.g., update state)
+                fetchTodos();
 
             } else {
                 console.error(data.message || 'Failed to delete todo');
-            }
-        } catch (error) {
-            console.error('An error occurred. Please try again.');
-        }
-    };
-
-
-    const updateTodo = async (todoId, updatedTodoData) => {
-        try {
-            const response = await fetch(`http://localhost:5005/todos/edit`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ todoId, updatedTodo: updatedTodoData }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                // Handle successful update (e.g., update state)
-                alert('Todo updated successfully');
-                setTodoInput({ heading: '', content: '' }); // Clear the form fields
-            } else {
-                console.error(data.message || 'Failed to update todo');
             }
         } catch (error) {
             console.error('An error occurred. Please try again.');
@@ -151,8 +153,8 @@ const TodoList = () => {
                         <Task
                             key={todo.id}
                             todo={todo}
-                            removeTodo={() => removeTodo(todo.id)}
-                            updateTodo={(updatedTodo) => updateTodo(todo.id, updatedTodo)}
+                            removeTodo={removeTodo}
+                            updateTodo={updateTodo}
                         />
                     ))}
                 </ListGroup>

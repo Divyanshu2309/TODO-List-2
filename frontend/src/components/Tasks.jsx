@@ -6,32 +6,47 @@ const Task = ({ todo, removeTodo, updateTodo }) => {
     const [updatedTodo, setUpdatedTodo] = useState({ heading: todo.heading, content: todo.content });
 
     const handleUpdate = () => {
-        updateTodo(todo._id, updatedTodo); // Assuming todo._id is used for identification in backend
+        updateTodo(todo._id, updatedTodo);
         setIsEditing(false);
     };
 
     return (
         <ListGroup.Item className="d-flex justify-content-between align-items-center">
             {isEditing ? (
-                <>
-                    <Form.Control
-                        type="text"
-                        value={updatedTodo.heading}
-                        onChange={(e) => setUpdatedTodo({ ...updatedTodo, heading: e.target.value })}
-                    />
-                    <Form.Control
-                        as="textarea"
-                        rows={3}
-                        value={updatedTodo.content}
-                        onChange={(e) => setUpdatedTodo({ ...updatedTodo, content: e.target.value })}
-                    />
-                    <Button variant="primary" size="sm" onClick={handleUpdate}>
-                        Save
-                    </Button>
-                    <Button variant="secondary" size="sm" onClick={() => setIsEditing(false)}>
-                        Cancel
-                    </Button>
-                </>
+                <div className="w-100">
+                    <Form.Group>
+                        <Form.Control
+                            type="text"
+                            value={updatedTodo.heading}
+                            onChange={(e) => setUpdatedTodo({ ...updatedTodo, heading: e.target.value })}
+                        />
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Control
+                            as="textarea"
+                            rows={3}
+                            value={updatedTodo.content}
+                            onChange={(e) => setUpdatedTodo({ ...updatedTodo, content: e.target.value })}
+                        />
+                    </Form.Group>
+                    <div className="d-flex justify-content-end">
+                        <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={handleUpdate}
+                            className="me-2"
+                        >
+                            Save
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => setIsEditing(false)}
+                        >
+                            Cancel
+                        </Button>
+                    </div>
+                </div>
             ) : (
                 <>
                     <div>
@@ -39,10 +54,19 @@ const Task = ({ todo, removeTodo, updateTodo }) => {
                         <p>{todo.content}</p>
                     </div>
                     <div>
-                        <Button variant="info" size="sm" onClick={() => setIsEditing(true)}>
+                        <Button
+                            variant="info"
+                            size="sm"
+                            onClick={() => setIsEditing(true)}
+                            className="me-2"
+                        >
                             Edit
                         </Button>
-                        <Button variant="danger" size="sm" onClick={() => removeTodo(todo._id)}>
+                        <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => removeTodo(todo._id)}
+                        >
                             Remove
                         </Button>
                     </div>
